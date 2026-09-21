@@ -2,7 +2,30 @@
 
 All notable changes to `@puku-ai/sdk` are documented in this file.
 
-This project follows [Semantic Versioning](https://semver.org/). The latest published version is **4.0.6**.
+This project follows [Semantic Versioning](https://semver.org/). The latest published version is **4.0.7**.
+
+---
+
+## [4.0.7] — 2026-09-21
+
+TypeScript-only patch release. No runtime behavior changes.
+
+The curated `export type { ... }` block at `src/vendor/index.ts:84-102` was omitting 10 Beta message types that puku-cli's downstream code imports from `@puku-ai/sdk`, producing `TS2614` / `TS2724` errors of the form `Module '"@puku-ai/sdk"' has no exported member 'BetaStopReason'`. The 10 missing types are declared inside `src/vendor/resources/beta/messages/messages.ts` but were never surfaced at the package root, so the SDK's own `tsc --noEmit` (which uses relative imports) didn't catch the curation defect.
+
+Additionally, the `Beta` namespace declared in `src/vendor/resources/beta/beta.ts` (line 867) was not re-exported, breaking the `PukuAI.Beta.Messages.*` nested-namespace access pattern that puku-cli uses in `src/utils/sideQuery.ts`, `src/utils/analyzeContext.ts`, `src/services/tokenEstimation.ts`, and `src/utils/permissions/yoloClassifier.ts`.
+
+Refs [puku-sh/puku-code-cli#419](https://github.com/puku-sh/puku-code-cli/issues/419).
+
+### Fixed
+- **10 missing Beta message types now exported from the package root.** `BetaJSONOutputFormat`, `BetaMessageDeltaUsage`, `BetaOutputConfig`, `BetaRawMessageStreamEvent`, `BetaRedactedThinkingBlock`, `BetaRedactedThinkingBlockParam`, `BetaRequestDocumentBlock`, `BetaStopReason`, `BetaToolChoiceAuto`, `BetaToolChoiceTool` resolve via both `import type { BetaStopReason } from "@puku-ai/sdk"` and the nested `PukuAI.Beta.Messages.BetaStopReason` access pattern.
+- **`Beta` namespace re-exported.** `import { Beta } from "@puku-ai/sdk"` now resolves to the namespace declaration in `src/vendor/resources/beta/beta.ts`, restoring the `PukuAI.Beta.Messages.*` access pattern puku-cli relies on.
+
+### Added
+- **`examples/issue-419-beta-type-exports.ts`** — type-level regression test covering all three access paths (top-level named import, `Beta.Messages.*`, `PukuAI.Beta.Messages.*`). Wire with `bunx tsc --noEmit -p examples/tsconfig.json`.
+- **`examples/tsconfig.json`** — dedicated tsconfig that resolves `@puku-ai/sdk` to the local source tree (mirrors jest's `moduleNameMapper`).
+
+### Notes
+- Patch release. No API or runtime behavior changes. `bun update @puku-ai/sdk` under the existing `^4.0.3` constraint will pick this up automatically.
 
 ---
 

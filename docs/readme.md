@@ -2,8 +2,6 @@
 
 This library provides convenient access to the Puku AI API from TypeScript or JavaScript.
 
-
-
 ## Installation
 
 ```sh
@@ -27,6 +25,44 @@ The following runtimes are supported:
 Note that React Native is not supported at this time.
 
 If you are interested in other runtime environments, open or upvote an issue on the [GitHub repository](https://github.com/puku-ai/puku-ai-sdk).
+
+## Beta message types
+
+All `Beta*` message types are reachable directly from the package root, either as named top-level exports or via the `PukuAI.Beta.Messages.*` namespace path. The full list surfaces all of:
+
+`BetaContentBlock`, `BetaContentBlockParam`, `BetaJSONOutputFormat`, `BetaMessage`, `BetaMessageDeltaUsage`, `BetaMessageParam`, `BetaMessageStreamParams`, `BetaOutputConfig`, `BetaRawMessageStreamEvent`, `BetaRedactedThinkingBlock`, `BetaRedactedThinkingBlockParam`, `BetaRequestDocumentBlock`, `BetaStopReason`, `BetaTextBlock`, `BetaTextBlockParam`, `BetaImageBlockParam`, `BetaThinkingBlock`, `BetaThinkingBlockParam`, `BetaTool`, `BetaToolChoiceAuto`, `BetaToolChoiceTool`, `BetaToolResultBlockParam`, `BetaToolUnion`, `BetaToolUseBlock`, `BetaToolUseBlockParam`, `BetaUsage`.
+
+```ts
+import PukuAI, {
+  // Named top-level exports (added in 4.0.7).
+  type BetaStopReason,
+  type BetaOutputConfig,
+  type BetaJSONOutputFormat,
+  type BetaMessageDeltaUsage,
+  type BetaRawMessageStreamEvent,
+  type BetaRequestDocumentBlock,
+  type BetaToolChoiceAuto,
+  type BetaToolChoiceTool,
+  type BetaRedactedThinkingBlock,
+  type BetaRedactedThinkingBlockParam,
+  // The Beta namespace (re-exported in 4.0.7).
+  Beta,
+} from '@puku-ai/sdk';
+
+const client = new PukuAI();
+
+// Option A — top-level named import
+const stopReason: BetaStopReason = 'end_turn';
+const outputConfig: BetaOutputConfig = {
+  format: { type: 'json_schema', schema: { type: 'object' } },
+};
+
+// Option B — nested-namespace access through the client class
+// (equivalent to `Beta.Messages.BetaStopReason` when Beta is imported directly)
+const ns: typeof PukuAI.Beta.Messages.BetaStopReason = stopReason;
+const nsCfg: typeof PukuAI.Beta.Messages.BetaOutputConfig = outputConfig;
+```
+
 
 ## Usage
 
